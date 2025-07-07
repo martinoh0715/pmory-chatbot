@@ -1,18 +1,20 @@
-async function sendMessageToAI(userMessage) {
+async function sendMessage() {
+  const input = document.getElementById("userInput");
+  const message = input.value;
+  if (!message) return;
+
+  const chatbox = document.getElementById("chatbox");
+  chatbox.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+
   const res = await fetch("/.netlify/functions/ask-ai", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify({ message: userMessage })
+    body: JSON.stringify({ message }),
   });
 
   const data = await res.json();
-  return data.reply;
+  chatbox.innerHTML += `<p><strong>PMory:</strong> ${data.reply}</p>`;
+  input.value = "";
 }
-
-// Example use:
-sendMessageToAI("What are top PM skills?").then(reply => {
-  console.log("AI replied:", reply);
-  // You can also display the reply in your chat box
-});
