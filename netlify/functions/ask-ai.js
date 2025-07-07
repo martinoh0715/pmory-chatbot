@@ -1,49 +1,41 @@
 const fetch = require("node-fetch");
 
-exports.handler = async function (event, context) {
+exports.handler = async function(event, context) {
+  const { message } = JSON.parse(event.body);
+  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
   try {
-    const { message } = JSON.parse(event.body);
-
-    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-    if (!OPENAI_API_KEY) {
-      console.error("❌ Missing OPENAI_API_KEY in environment variables");
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: "Missing API key" }),
-      };
-    }
-
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
+        "Authorization": `Bearer ${OPENAI_API_KEY}`
       },
       body: JSON.stringify({
         model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: message }],
-      }),
+        messages: [{ role: "user", content: message }]
+      })
     });
 
     const data = await response.json();
 
-    if (!data.choices || !data.choices[0]) {
-      console.error("❌ Invalid OpenAI API response:", data);
+    if (data.error) {
+      console.error("OpenAI API error:", data.error);
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: "Invalid OpenAI response" }),
+        body: JSON.stringify({ reply: `OpenAI Error: ${data.error.message}` })
       };
     }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ reply: data.choices[0].message.content }),
+      body: JSON.stringify({ reply: data.choices[0].message.content })
     };
-  } catch (err) {
-    console.error("❌ Function error:", err);
+  } catch (error) {
+    console.error("Server error:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Function error" }),
+      body: JSON.stringify({ reply: "Server error. Please try again later." })
     };
   }
 };
