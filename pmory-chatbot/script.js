@@ -1,12 +1,12 @@
 const chatlog = document.getElementById('chatlog');
 const userInput = document.getElementById('userInput');
 
-// Load welcome message
+// ✅ Auto welcome message
 window.onload = () => {
   displayBotMessage("👋 Hi! I'm PMory, your AI mentor for Product Management. Ask me anything to get started!");
 };
 
-// Handle "Enter" key
+// ✅ Enter key support
 userInput.addEventListener("keypress", function (e) {
   if (e.key === "Enter") {
     sendMessage();
@@ -46,7 +46,7 @@ function displayBotMessage(text) {
   wrapper.className = 'bot-msg';
 
   const profileImg = document.createElement('img');
-  profileImg.src = 'pmory-logo.png';
+  profileImg.src = 'pmory-logo.png'; // ✅ must be same as uploaded filename
   profileImg.alt = 'PMory';
 
   const textDiv = document.createElement('div');
