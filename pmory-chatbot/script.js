@@ -1,60 +1,60 @@
-const chatBox = document.getElementById('chat-box');
-const userInput = document.getElementById('user-input');
-const sendButton = document.getElementById('send-button');
+const chatlog = document.getElementById('chatlog');
+const userInput = document.getElementById('userInput');
 
-function addMessage(message, sender) {
-  const messageDiv = document.createElement('div');
-  messageDiv.classList.add('message', sender);
+// Load welcome message
+window.onload = () => {
+  displayBotMessage("👋 Hi! I'm PMory, your AI mentor for Product Management. Ask me anything to get started!");
+};
 
-  if (sender === 'bot') {
-    const profileImg = document.createElement('img');
-    profileImg.src = 'pmory-logo.png'; // make sure the image is in the same directory
-    profileImg.alt = 'PMory';
-    profileImg.classList.add('bot-avatar');
-    messageDiv.appendChild(profileImg);
-  }
-
-  const messageText = document.createElement('div');
-  messageText.textContent = message;
-  messageDiv.appendChild(messageText);
-
-  chatBox.appendChild(messageDiv);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-async function sendMessage() {
-  const message = userInput.value.trim();
-  if (!message) return;
-
-  addMessage(message, 'user');
-  userInput.value = '';
-
-  try {
-    const res = await fetch('/.netlify/functions/ask-ai', {
-      method: 'POST',
-      body: JSON.stringify({ message })
-    });
-
-    const data = await res.json();
-    if (data.reply) {
-      addMessage(data.reply, 'bot');
-    } else {
-      addMessage('Error: No response from server.', 'bot');
-    }
-  } catch (error) {
-    addMessage('Error: Failed to get response.', 'bot');
-  }
-}
-
-sendButton.addEventListener('click', sendMessage);
-
-userInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
+// Handle "Enter" key
+userInput.addEventListener("keypress", function (e) {
+  if (e.key === "Enter") {
     sendMessage();
   }
 });
 
-window.onload = () => {
-  addMessage("👋 Hi! I'm PMory, your AI mentor for Product Management. Ask me anything to get started!", 'bot');
-};
+async function sendMessage() {
+  const message = userInput.value.trim();
+  if (message === '') return;
+
+  appendMessage("You", message);
+  userInput.value = '';
+
+  try {
+    const response = await fetch('/.netlify/functions/ask-ai', {
+      method: 'POST',
+      body: JSON.stringify({ message }),
+    });
+
+    const data = await response.json();
+    displayBotMessage(data.reply || 'Sorry, no response.');
+  } catch (error) {
+    displayBotMessage('⚠️ Error: Failed to get response.');
+  }
+}
+
+function appendMessage(sender, message) {
+  const div = document.createElement('div');
+  div.classList.add('user');
+  div.innerHTML = `<strong>${sender}:</strong> ${message}`;
+  chatlog.appendChild(div);
+  chatlog.scrollTop = chatlog.scrollHeight;
+}
+
+function displayBotMessage(text) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'bot-msg';
+
+  const profileImg = document.createElement('img');
+  profileImg.src = 'pmory-logo.png';
+  profileImg.alt = 'PMory';
+
+  const textDiv = document.createElement('div');
+  textDiv.className = 'bot-text';
+  textDiv.innerText = text;
+
+  wrapper.appendChild(profileImg);
+  wrapper.appendChild(textDiv);
+  chatlog.appendChild(wrapper);
+  chatlog.scrollTop = chatlog.scrollHeight;
+}
