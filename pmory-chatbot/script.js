@@ -1,47 +1,40 @@
 async function sendMessage() {
-  const input = document.getElementById("userInput");
+  const input = document.getElementById('userInput');
   const message = input.value.trim();
   if (!message) return;
 
-  appendMessage("You", message, true);
+  addMessage("You", message, false);
   input.value = "";
 
   try {
     const response = await fetch("/.netlify/functions/ask-ai", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message })
+      body: JSON.stringify({ message }),
     });
 
     const data = await response.json();
-    if (data.reply) {
-      appendMessage("PMory", data.reply, false);
-    } else {
-      appendMessage("Error", "Something went wrong. No reply returned.", false);
-    }
+    addMessage("PMory", data.reply, true);
   } catch (error) {
-    appendMessage("Error", "Failed to get response.", false);
+    addMessage("Error", "Failed to get response.", true);
   }
 }
 
-function appendMessage(sender, message, isUser) {
+function addMessage(sender, text, isBot = false) {
   const chatbox = document.getElementById("chatbox");
-  const messageElement = document.createElement("div");
-  const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const messageEl = document.createElement("div");
+  messageEl.classList.add("message");
 
-  messageElement.classList.add("message", isUser ? "user" : "bot");
-  messageElement.innerHTML = `<strong>${sender}</strong> <small>${timestamp}</small><br>${message}`;
-  chatbox.appendChild(messageElement);
+  if (isBot) {
+    messageEl.innerHTML = `
+      <div class="bot-container">
+        <img src="pmory-logo.png" alt="PMory Logo" class="bot-avatar" />
+        <div class="bot-text">${text}</div>
+      </div>
+    `;
+  } else {
+    messageEl.innerHTML = `<span class="user-message">${sender}:</span> ${text}`;
+  }
+
+  chatbox.appendChild(messageEl);
   chatbox.scrollTop = chatbox.scrollHeight;
 }
-
-document.getElementById("userInput").addEventListener("keydown", function (event) {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    sendMessage();
-  }
-});
-
-window.onload = function () {
-  appendMessage("PMory", "👋 Hi! I’m PMory, your AI mentor for Product Management. Ask me anything to get started!", false);
-};
