@@ -4,101 +4,76 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PMory AI Mentor</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter&display=swap" />
   <style>
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
       background-color: #f9fafb;
-      margin: 0;
       padding: 2rem;
     }
-
-    .chat-container {
-      background: #f3f4f6;
+    .chatbox {
+      background: #fff;
       border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
       padding: 2rem;
-      max-width: 900px;
-      margin: auto;
+      max-width: 800px;
+      margin: 0 auto;
     }
-
-    h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-    }
-
-    #chat-box {
-      background-color: #ffffff;
-      border: 1px solid #e5e7eb;
+    .chatlog {
+      border: 1px solid #ddd;
       border-radius: 8px;
       padding: 1rem;
-      height: 500px;
-      overflow-y: auto;
+      min-height: 300px;
       margin-bottom: 1rem;
     }
-
-    .message {
-      margin-bottom: 1rem;
-      padding: 0.75rem 1rem;
-      border-radius: 10px;
-      max-width: 80%;
+    .user {
+      font-weight: bold;
+      margin-top: 1rem;
     }
-
-    .message.user {
-      background-color: #e5e7eb;
-      align-self: flex-end;
-      font-weight: 500;
-    }
-
-    .message.bot {
-      background-color: #e0f2ff;
+    .bot-msg {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
+      margin-top: 0.5rem;
     }
-
-    .bot-avatar {
-      width: 24px;
-      height: 24px;
+    .bot-msg img {
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       margin-right: 10px;
     }
-
-    .input-row {
-      display: flex;
-      gap: 0.5rem;
+    .bot-text {
+      background: #e5f0ff;
+      color: #111;
+      padding: 10px 14px;
+      border-radius: 12px;
+      max-width: 80%;
     }
-
     input[type="text"] {
-      flex: 1;
+      width: calc(100% - 60px);
       padding: 0.5rem;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
     }
-
     button {
       padding: 0.5rem 1rem;
-      background-color: #2563eb;
-      color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      margin-left: 0.5rem;
       cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #1e40af;
     }
   </style>
 </head>
 <body>
-  <div class="chat-container">
+  <div class="chatbox">
     <h1>PMory AI Mentor</h1>
-    <div id="chat-box"></div>
-    <div class="input-row">
-      <input type="text" id="user-input" placeholder="Ask me anything..." />
-      <button id="send-button">Send</button>
+    <div id="chatlog" class="chatlog"></div>
+    <div>
+      <input id="userInput" type="text" placeholder="Ask me anything..." />
+      <button onclick="sendMessage()">Send</button>
     </div>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
