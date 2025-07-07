@@ -1,11 +1,17 @@
-const fetch = require("node-fetch");
-
 exports.handler = async function(event, context) {
-  const { message } = JSON.parse(event.body);
-  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const { message } = JSON.parse(event.body);
+    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
+    if (!OPENAI_API_KEY) {
+      console.log("❌ No OpenAI API key found in environment variables.");
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "Missing OpenAI API key." })
+      };
+    }
+
+    const apiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -17,13 +23,13 @@ exports.handler = async function(event, context) {
       })
     });
 
-    const data = await response.json();
+    const data = await apiResponse.json();
 
     if (data.error) {
-      console.error("OpenAI API error:", data.error);
+      console.log("OpenAI API error:", data.error);
       return {
         statusCode: 500,
-        body: JSON.stringify({ reply: `OpenAI Error: ${data.error.message}` })
+        body: JSON.stringify({ error: data.error.message || "OpenAI API error" })
       };
     }
 
@@ -31,11 +37,12 @@ exports.handler = async function(event, context) {
       statusCode: 200,
       body: JSON.stringify({ reply: data.choices[0].message.content })
     };
+
   } catch (error) {
-    console.error("Server error:", error);
+    console.error("Function Error:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ reply: "Server error. Please try again later." })
+      body: JSON.stringify({ error: "Server error occurred." })
     };
   }
 };
