@@ -1,8 +1,14 @@
 exports.handler = async function(event, context) {
-  const { message } = JSON.parse(event.body);
-  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-
   try {
+    const { message } = JSON.parse(event.body);
+
+    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+    console.log("🔑 OpenAI Key exists:", !!OPENAI_API_KEY); // Log if key is found
+
+    if (!OPENAI_API_KEY) {
+      throw new Error("Missing OpenAI API Key in environment variables");
+    }
+
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -16,28 +22,17 @@ exports.handler = async function(event, context) {
     });
 
     const data = await response.json();
-
-    // Log to debug in Netlify if needed
-    console.log("OpenAI response:", JSON.stringify(data));
-
-    const reply = data?.choices?.[0]?.message?.content;
-
-    if (!reply) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ reply: "❌ AI did not respond. Check your API key or request format." })
-      };
-    }
+    console.log("✅ OpenAI API response:", data);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ reply })
+      body: JSON.stringify({ reply: data.choices[0].message.content })
     };
   } catch (err) {
-    console.error("OpenAI API error:", err);
+    console.error("❌ Error in ask-ai.js:", err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ reply: "❌ Server error. Try again later." })
+      body: JSON.stringify({ reply: "❌ Failed to get response from AI." })
     };
   }
 };
